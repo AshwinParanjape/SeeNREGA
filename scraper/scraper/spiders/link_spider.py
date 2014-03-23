@@ -25,15 +25,33 @@ class link_spider(CrawlSpider):
 		sel = Selector(response);
 		base_url = get_base_url(response)
 		anchorList = sel.xpath(block_extractor)
-		itemList = []
 		for anchor in anchorList:
-			item = block()
-			item['name'] = anchor.xpath('./text()').extract();
-			item['link'] = urljoin_rfc(base_url, anchor.xpath('./@href').extract()[0])
-			itemList.append(item)
-		return itemList
+			item = BlockItem()
+			item['district'] = response.meta['district']
+			item['name'] = anchor.xpath('./text()').extract()
+			next_link = urljoin_rfc(base_url, anchor.xpath('./@href').extract()[0])
+			item['link'] = next_link
+			query_dict = parse_url(next_link)
+			item['code'] = query_dict[block_code]
+			blockInstance = item.save()
+			request = Request(next_link, self.parse_village_list)
+			request.meta['block'] = blockInstance
+			yield request
 
-		return []
+	def parse_village_list(self,response):
+		sel = Selector(response);
+		base_url = get_base_url(response)
+		anchorList = sel.xpath(panchayat_extractor)
+		for anchor in anchorList:
+			item = PanchayatItem()
+			item['block'] = response.meta['block']
+			item['name'] = anchor.xpath('./text()').extract()
+			next_link = anchor.xpath('./@href').extract()[0]
+			query_dict = parse_url(next_link)
+			item['code'] = query_dict[panchayat_code]
+			item.save()
+		return Dummy()
+
 	def open_english(self, response):
 		sel = Selector(response);
 		base_url = get_base_url(response)
@@ -53,13 +71,16 @@ class link_spider(CrawlSpider):
 		stateInstance = state.save()
 
 		anchorList = sel.xpath(district_extractor)
-		itemList = []
 		for anchor in anchorList:
 			item = DistrictItem()
 			item['state'] = stateInstance
 			item['name'] = anchor.xpath('./text()').extract()
-			query_dict = parse_url(anchor.xpath('./@href').extract()[0])
+			next_link = urljoin_rfc(base_url, anchor.xpath('./@href').extract()[0])
+			query_dict = parse_url(next_link)
 			item['code'] = query_dict[district_code]
-			item.save()
+			districtInstance = item.save()
+			request = Request(next_link, self.parse_block_list)
+			request.meta['district'] = districtInstance
+			yield request
 
-		return Dummy()
+
