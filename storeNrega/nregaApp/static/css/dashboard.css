@@ -1,0 +1,14 @@
+.ui-accordion .ui-accordion-header{
+	padding:0;
+}
+body, html { /* set size of body to full page and remove margins */
+	width: 100%;
+	height: 100%;
+	padding: 0;
+	margin: 0;
+}
+
+.stateAccordion {
+	height: 400px;
+	overflow-y: scroll;
+}

@@ -62,31 +62,44 @@ class block_data_spider(Spider):
 		colMapping = blockDataConfig[linkText][2]
 		
 		#assumes Panchayat objects have been created with name filled in
-		#panchayats = Panchayat.objects.filter(block = blockKey)
-		panchayats = [Panchayat.objects.get(code = '219004021')];
+		panchayats = Panchayat.objects.filter(block = blockKey)
+		#panchayats = [Panchayat.objects.get(code = '219004021')];
+		newRows = []
 		for panchayat in panchayats:
-			panchayat_row_extractor = '//tr//td['+str(nameCol)+']//*[text() ="'+panchayat.name+'"]/ancestor::tr'
+			panchayat_row_extractor = '//tr//td['+str(nameCol)+']//descendant-or-self::*[text() ="'+panchayat.name+'"]/ancestor::tr'
 			row_selector = sel.xpath(panchayat_row_extractor)
 			for colNum in colMapping:
 
-				print '//tr//td['+str(nameCol)+']//*[text()="'+panchayat.name+'"]/ancestor::tr/td['+str(colNum)+']//text()'
+				print '//tr//td['+str(nameCol)+']//descendant-or-self::*[text()="'+panchayat.name+'"]/ancestor::tr/td['+str(colNum)+']//text()'
 				data_path = 'td['+str(colNum)+']//text()'
 				print row_selector.xpath(data_path).extract();
 				numString = ''.join(row_selector.xpath(data_path).extract()).strip()
 				nums = re.findall('^[0-9]+',numString)[0]
-				
-				obj, created = PanchayatData.objects.update_or_create(
-						state_code = query_dict[state_code],
+
+				newRows.append(PanchayatData(state_code = query_dict[state_code],
 						district_code = query_dict[district_code],
 						block_code = query_dict[block_code],
-                        panchayat_code = panchayat.code,
+						panchayat_code = panchayat.code,
 						year = query_dict[year][:4],
 						attribute_0 = tableNum,
 						attribute_1 = self.getAttributeVal(colMapping[colNum],0),
 						attribute_2 = self.getAttributeVal(colMapping[colNum],1),
 						attribute_3 = self.getAttributeVal(colMapping[colNum],2),
-						defaults = {'data':nums}
-						);
+						data = nums))
+
+				#obj, created = PanchayatData.objects.update_or_create(
+				#		state_code = query_dict[state_code],
+				#		district_code = query_dict[district_code],
+				#		block_code = query_dict[block_code],
+                #       panchayat_code = panchayat.code,
+				#		year = query_dict[year][:4],
+				#		attribute_0 = tableNum,
+				#		attribute_1 = self.getAttributeVal(colMapping[colNum],0),
+				#		attribute_2 = self.getAttributeVal(colMapping[colNum],1),
+				#		attribute_3 = self.getAttributeVal(colMapping[colNum],2),
+				#		defaults = {'data':nums}
+				#		);
 			#	panchayat_data.data = nums
 			#panchayat.save()
+		PanchayatData.objects.bulk_create(newRows);
 		return Dummy()
