@@ -5,7 +5,7 @@
 
 from django.db import models
 from scrapy.contrib.djangoitem import DjangoItem
-from nregaApp.models import State, District, Block, Panchayat
+from nregaApp.models import State, District, Block, Panchayat, PanchayatData
 
 from scrapy.item import Item, Field
 
@@ -19,6 +19,9 @@ class BlockItem(DjangoItem):
 	django_model = Block
 	
 class PanchayatItem(DjangoItem):
+	django_model = Panchayat
+
+class PanchayatDataItem(DjangoItem):
 	django_model = Panchayat
 	
 class Dummy(Item):

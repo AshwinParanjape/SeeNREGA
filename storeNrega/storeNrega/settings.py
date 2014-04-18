@@ -4,14 +4,20 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
-    # ('Ashwin', 'ashwing.2005@gmail.com'),
+     ('Ashwin', 'ashwing.2005@gmail.com'),
 )
 
 MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        #'ENGINE': 'django.contrib.gis.db.backends.postgis', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        #'NAME': 'nrega',                      # Or path to database file if using sqlite3.
+        #'USER': 'server',                      # Not used with sqlite3.
+        #'PASSWORD': 'wellisall',                  # Not used with sqlite3.
+        #'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
+        #'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+		'ENGINE' : 'django.contrib.gis.db.backends.mysql',
         'NAME': 'nrega',                      # Or path to database file if using sqlite3.
         'USER': 'root',                      # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
@@ -113,15 +119,17 @@ TEMPLATE_DIRS = (
 )
 
 INSTALLED_APPS = (
-    'django.contrib.auth',
+    #'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
 	'nregaApp',
+	#'django.contrib.gis',
     # Uncomment the next line to enable the admin:
-     'django.contrib.admin',
+    #'django.contrib.admin',
+	 #'south',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )
@@ -151,6 +159,6 @@ LOGGING = {
             'handlers': ['mail_admins'],
             'level': 'ERROR',
             'propagate': True,
-        },
+		},
     }
 }
