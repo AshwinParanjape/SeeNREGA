@@ -8,6 +8,7 @@ Prerequisites
 * python python-dev
 * pip
 * mysql-server libmysqlclient-dev
+* django=1.7b1
 * virtualenv (optional)
 * git (to get the lastest versions and contribute)
 
