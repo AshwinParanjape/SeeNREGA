@@ -3,6 +3,14 @@ SeeNREGA
 
 A webservice which allows rich queries to be executed and visualizations to be generated on India's NREGA data obtained by periodically crawling its website
 
+Prerequisites 
+-------------
+* python
+* pip
+* mysql-server libmysqlclient-dev
+* virtualenv (optional)
+* git (to get the lastest versions and contribute)
+
 Scraper
 -------
 This is a scrapy project which links to the database through django models.
