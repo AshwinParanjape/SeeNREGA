@@ -5,10 +5,11 @@ A webservice which allows rich queries to be executed and visualizations to be g
 
 Prerequisites 
 -------------
-python
-pip
-virtualenv (optional)
-git (to get the lastest versions and contribute)
+* python
+* pip
+* mysql-server libmysqlclient-dev
+* virtualenv (optional)
+* git (to get the lastest versions and contribute)
 
 Scraper
 -------
