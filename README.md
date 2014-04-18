@@ -5,7 +5,7 @@ A webservice which allows rich queries to be executed and visualizations to be g
 
 Prerequisites 
 -------------
-* python
+* python python-dev
 * pip
 * mysql-server libmysqlclient-dev
 * virtualenv (optional)
