@@ -1,5 +1,6 @@
 .ui-accordion .ui-accordion-header{
 	padding:0;
+	display:inline-block;
 }
 body, html { /* set size of body to full page and remove margins */
 	width: 100%;
@@ -8,7 +9,30 @@ body, html { /* set size of body to full page and remove margins */
 	margin: 0;
 }
 
-.stateAccordion {
+.stateAccordion { height: 400px; overflow-y: scroll; }
+
+.ui-slider{
+	border: 2px solid #222222;
+}
+.ui-slider-range{
+	background-color:#999999;
+}
+.ui-slider-handle{
+	background-color:#333333;
+}
+#chart-selector{
 	height: 400px;
 	overflow-y: scroll;
+}
+.indicator-unit>h5{
+	font-weight:bold;
+}
+.disabled-chart{
+	display:none;
+}
+.no-alert{
+	display:none;
+}
+.panchayatName{
+	display:inline-block;
 }
