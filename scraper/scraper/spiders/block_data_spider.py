@@ -19,14 +19,18 @@ django.setup()
 from django.db import transaction
 
 class block_data_spider(Spider):
+	print django.VERSION
 	name = "block_data"
 	
-	block = Block.objects.get(code = '219004')
-	#blocks = Block.objects.filter(district_id= '0219')
-	#block_links = [b.link for b in blocks]
-	#start_urls = block_links
-	start_urls = [block.link]
-	print [x for x in blockDataConfig]
+	#block = Block.objects.get(code = '219004')
+	districts = District.objects.filter(state = '02')
+	blocks = []
+	for d in districts:
+		blocks.extend(Block.objects.filter(district = d))
+	block_links = [b.link for b in blocks]
+	start_urls = block_links
+	#start_urls = [block.link]
+	#print [x for x in blockDataConfig]
 	#rules = ((Rule(SgmlLinkExtractor (restrict_xpaths = link_xpath,) ,callback="parse_block_data", ) for link_xpath in table_link_extractors))
 
 	def parse(self, response):
@@ -41,7 +45,9 @@ class block_data_spider(Spider):
 			request = Request(next_link, self.parse_block_data)
 			request.meta['linkText'] = table_name
 			request.meta['query_dict']=query_dict
-			request.meta['blockKey'] = Block.objects.get(code=query_dict[block_code]+'') 
+			b = Block.objects.get(code=query_dict[block_code]+'') 
+			print b.name
+			request.meta['blockKey'] = b
 			yield request
 
 	def getAttributeVal(self ,l, ind):
@@ -51,7 +57,7 @@ class block_data_spider(Spider):
 			    b = 0
 		return b
 
-	@transaction.atomic
+	#@transaction.atomic
 	def parse_block_data(self, response):
 		sel = Selector(response)
 		linkText = response.meta['linkText']
@@ -70,9 +76,9 @@ class block_data_spider(Spider):
 			row_selector = sel.xpath(panchayat_row_extractor)
 			for colNum in colMapping:
 
-				print '//tr//td['+str(nameCol)+']//descendant-or-self::*[text()="'+panchayat.name+'"]/ancestor::tr/td['+str(colNum)+']//text()'
+				#print '//tr//td['+str(nameCol)+']//descendant-or-self::*[text()="'+panchayat.name+'"]/ancestor::tr/td['+str(colNum)+']//text()'
 				data_path = 'td['+str(colNum)+']//text()'
-				print row_selector.xpath(data_path).extract();
+				#print row_selector.xpath(data_path).extract();
 				numString = ''.join(row_selector.xpath(data_path).extract()).strip()
 				nums = re.findall('^[0-9]+',numString)[0]
 
