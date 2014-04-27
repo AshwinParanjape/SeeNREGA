@@ -5,9 +5,10 @@ A webservice which allows rich queries to be executed and visualizations to be g
 
 Prerequisites 
 -------------
-* python
+* python python-dev
 * pip
 * mysql-server libmysqlclient-dev
+* django=1.7b1
 * virtualenv (optional)
 * git (to get the lastest versions and contribute)
 

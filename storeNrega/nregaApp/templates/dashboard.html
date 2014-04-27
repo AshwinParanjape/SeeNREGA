@@ -50,30 +50,222 @@
 			</div>
 		</div>
 
-		<div class="container" style="margin-top:40px;">
+		<div class="container-fluid" style="margin-top:80px;">
 
 			<div class="row">
-				<div class="col-sm-2">
+				<div class="col-md-7">
 					<div class="row">
+						<div class="col-md-12">
+
+							<h3>
+								<input id="range-check" type="checkbox">
+								<label for="range-check">
+									Time Series
+								</label>
+								<label class="pull-right"for="year-range">
+									Year range:</label>
+								<input class="pull-right" style="border:none" type="text" id="year-range">
+							</h3>
+
+							<div id="year-slider"></div>
+						</div>
+					</div>
+					<div class="row indicatorAccordion">
+						<div class="col-md-12">
+							<h3>
+								Indicators
+							</h3>
+							<div class="row ">
+								<div class="col-md-12">
+									<div id="registrations" class="data-cat">
+										<h4>
+											Registrations
+										</h4>
+										<div class="row">
+											<div id="unit" class="indicator-unit y-axis col-md-6">
+												<h5> Unit</h5>
+												<div class="checkbox-group">
+													<li>Households</li>
+													<li>Workers</li>
+												</div>
+											</div>
+											<div id="category" class="indicator-unit col-md-6">
+												<h5> Category</h5>
+												<div class="checkbox-group">
+													<li>SC</li>
+													<li>ST</li>
+													<li>Others</li>
+													<li>Women</li>
+													<li class="aggregate">Total</li>
+												</div>
+											</div>
+											<div id="gender" class="indicator-unit col-md-6">
+												<h5> Gender</h5>
+												<div class="checkbox-group">
+													<li>Women</li>
+													<li>Others</li>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-12">
+									<div id="works" class="data-cat">
+										<h4>
+											Works
+										</h4>
+										<div class="row">
+											<!--<div id="measure" class="indicator-unit y-axis col-md-3">
+												<h5> Measure</h5>
+												<div class="checkbox-group">
+													<li>Number</li>
+													<li>Expenditure</li>
+												</div>
+											</div>-->
+											<div id="progress" class="indicator-unit col-md-3">
+												<h5> Progress</h5>
+												<div class="checkbox-group">
+													<li>Completed</li>
+													<li>In Progress/Suspended</li>
+													<li>Approved but Not In Progress</li>
+													<li>Proposed but Not Approved</li>
+												</div>
+
+											</div>
+											<div id="type" class="indicator-unit col-md-6">
+												<h5> Type</h5>
+												<div class="checkbox-group">
+													<li>Rural Connectivity</li>
+													<Li>Flood Control</Li>
+													<Li>Water Conservation And Water Harversting</Li>
+													<Li>Renovation Of Traditional Water Bodies</Li>
+													<Li>Drought Proofing</Li>
+													<Li>Irrigation Canal</Li>
+													<Li>Irrigation Facilities To Sc/St/IAY/LR</Li>
+													<Li>Land Development</Li>
+													<Li>Other Work</Li>
+													<Li>Rajiv Gandhi Seva Kendra</Li>
+													<Li>Coastal Areas</Li>
+													<Li>Rural Drinking Water</Li>
+													<Li>Fisheries</Li>
+													<Li>Rural Sanitation</Li>
+												</div>
+											</div>
+										</div>
+									</div> 
+								</div> 
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3 col-sm-6">
 						<h3> Adminisitrative Areas</h3>
-						<ul class="">
+						<ul class="stateAccordion">
 							{% for state_code,districtList in adm.items %}
-							<li class="stateName">{{ districtList.0 }}</li>
-							<ul class="">
+							<input class="state-checkbox adm-checkbox" type="checkbox" value='{{ state_code }}'> <li class="stateName">{{ districtList.0 }}</li>
+							<ul class="districtAccordion">
 								{% for district_code,blockList in districtList.1.items %}
-								<li class="districtName"> {{blockList.0}}</li>
-								<ul>
+								<input class="district-checkbox adm-checkbox" type="checkbox" value='{{ district_code}}'/><li class="districtName"> {{blockList.0}}</li>
+								<ul class="blockAccordion">
 									{% for block_code,panchayatList in blockList.1.items %}
 
-									<li> {{panchayatList.0}} </li>
+									<input class="block-checkbox adm-checkbox" type="checkbox" value='{{block_code}}'/><li class="blockName"> {{panchayatList.0}} </li><ul></ul></br>
 									{% endfor %}
 								</ul>
 								{% endfor %}
 							</ul>
 							{% endfor %}
 						</ul>
-					<div class="row">
 				</div>
+				<div  class="col-md-2 col-sm-6">
+					<h3 class="text-center"> Charts </h3>
+					<div id="chart-selector">
+						<div id="line-thumb" class="thumbnail">
+							<img src="{% static "img/chartThumbnails/chart-line.svg" %}" alt="Line Chart">
+							<div class="caption">
+								<p class="text-center">Line Chart</p>
+							</div>
+						</div>
+						<div id="area-stacked-thumb" class="thumbnail">
+							<img src="{% static "img/chartThumbnails/chart-stacked.svg" %}" alt="Stacked Area Chart">
+							<div class="caption">
+								<p class="text-center">Stacked Area Chart</p>
+							</div>
+						</div>
+						<div id="area-percentage-thumb" class="thumbnail">
+							<img src="{% static "img/chartThumbnails/chart-percentage.svg" %}" alt="Percentage Area Chart">
+							<div class="caption">
+								<p class="text-center">Percentage Area Chart</p>
+							</div>
+						</div>
+						<div id="bar-thumb" class="thumbnail">
+							<img src="{% static "img/chartThumbnails/chart-basicbar.svg" %}" alt="Bar Chart">
+							<div class="caption">
+								<p class="text-center">Bar Chart</p>
+							</div>
+						</div>
+						<div id="bar-stacked-thumb" class="thumbnail">
+							<img src="{% static "img/chartThumbnails/chart-stackedbar.svg" %}" alt="Stacked Bar Chart">
+							<div class="caption">
+								<p class="text-center">Stacked Bar Chart</p>
+							</div>
+						</div>
+						<div id="column-thumb" class="thumbnail">
+							<img src="{% static "img/chartThumbnails/chart-basiccolumn.svg" %}" alt="Column Chart">
+							<div class="caption">
+								<p class="text-center">Column Chart</p>
+							</div>
+						</div>
+						<div id="column-stacked-thumb" class="thumbnail">
+							<img src="{% static "img/chartThumbnails/chart-stackedcolumn.svg" %}" alt="Stacked Column Chart">
+							<div class="caption">
+								<p class="text-center">Stacked Column Chart</p>
+							</div> 
+						</div>
+						<div id="column-stacked-percentage-thumb" class="thumbnail">
+							<img src="{% static "img/chartThumbnails/chart-stackedpercentagecolumn.svg" %}" alt="Stacked Percentage Column Chart">
+							<div class="caption">
+								<p class="text-center">Stacked Percentage Column Chart</p>
+							</div> 
+						</div>
+						<div id="pie-thumb" class="thumbnail">
+							<img src="{% static "img/chartThumbnails/chart-pie.svg" %}" alt="Pie Chart">
+							<div class="caption">
+								<p class="text-center">Pie Chart</p>
+							</div>
+						</div>
+						<div id="pie-donut-thumb" class="thumbnail">
+							<img src="{% static "img/chartThumbnails/chart-donut.svg" %}" alt="Donut Chart">
+							<div class="caption">
+								<p class="text-center">Donut Chart</p>
+							</div>
+						</div>
+					</div>
+					
+
+
+				</div>
+				<div class="row">
+					<div class="col-sm-12 text-center">
+						<div id="seriesInfo" class="alert alert-info">
+							<p id="series1Info"></p>
+							<p id="series2Info"></p>
+						</div>
+						<div id="generate-alert"  class="alert alert-warning no-alert"></div>
+						<button id="generate-button" type="button" class="btn btn-primary btn-lg ">Generate !</button>
+					</div>
+				</div>
+				<div class="row">
+					<div id="chart" class="col-sm-12">
+					</div>
+				</div>
+				<div class="row">
+					<div id="table" class="col-sm-12">
+					</div>
+				</div>
+
 			</div>
 
 		</div><!-- /.container -->
@@ -86,11 +278,9 @@
 		<script src="{% static "js/jquery-2.1.0.min.js" %}"></script>
 		<script src="{% static "js/jquery-ui-1.10.4.custom.min.js" %}"></script>
 		<script src="{% static "js/bootstrap.min.js" %}"></script>
-		<script>
-			$(function() {
-				$( ".stateAccordion" ).accordion({header: "li.stateName", heightStyle: "content", collapsible:"true", active: false});
-				$( ".districtAccordion" ).accordion({header: "li.districtName", heightStyle: "content", collapsible: "true", active: false});
-			});
-		</script>
+		<script src="{% static "js/dashboard.js" %}"></script>
+		<script src="{% static "js/highcharts/highcharts.js" %}"></script>
+		<script src="{% static "js/highcharts/modules/exporting.js" %}"></script>
+		
 	</body>
 </html>
