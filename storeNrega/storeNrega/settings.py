@@ -8,7 +8,6 @@ ADMINS = (
 )
 
 MANAGERS = ADMINS
-
 DATABASES = {
     'default': {
         #'ENGINE': 'django.contrib.gis.db.backends.postgis', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
@@ -17,14 +16,16 @@ DATABASES = {
         #'PASSWORD': 'wellisall',                  # Not used with sqlite3.
         #'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         #'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
-		'ENGINE' : 'django.contrib.gis.db.backends.mysql',
+	    #'ENGINE' : 'django.contrib.gis.db.backends.mysql',
+    	'ENGINE' : 'django.db.backends.mysql',
         'NAME': 'nrega',                      # Or path to database file if using sqlite3.
         'USER': 'root',                      # Not used with sqlite3.
-        'PASSWORD': '',                  # Not used with sqlite3.
+        'PASSWORD': 'ironfist',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
 }
+
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en//ref/settings/#allowed-hosts
@@ -162,3 +163,20 @@ LOGGING = {
 		},
     }
 }
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
+    }
+}
+
+try:
+    from local_settings import *
+except ImportError:
+    pass
+
+try:
+    from production_settings import *
+except ImportError:
+    pass
+

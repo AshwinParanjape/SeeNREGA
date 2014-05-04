@@ -5,7 +5,7 @@ $( ".blockAccordion" ).accordion({header: "li.blockName", heightStyle: "content"
 		console.log('der der');
 		var that = ui.newHeader;
 		jQuery.ajax({
-			url: 'panchayatList/'+that.siblings('input').attr('value')+'/'}).done(function(server_data,text_status,jqXHR){
+			url: 'panchayatList/'+that.prev('input').attr('value')+'/'}).done(function(server_data,text_status,jqXHR){
 				var newul = that.next('ul');
 				for(code in server_data){
 					newul.append('<input class="panchayat-checkbox adm-checkbox" type="checkbox" value="'+code+'"/><li class="panchayatName">'+server_data[code]+ '</li></br>');
@@ -53,7 +53,7 @@ data_series2=null;
 function get_chart(thumbString){
 	strs = thumbString.split("-");
 	var stacked = null;
-	chart = strs[0]
+	chart1 = strs[0]
 	if(strs.indexOf("percentage")>-1){
 		stacked = "percentage";
 	}
@@ -62,14 +62,15 @@ function get_chart(thumbString){
 	}
 	chartDict={
 		chart: {
-			type: chart
+			type: chart1
 		},
 		plotOptions:{
-			chart:{
-				stacking: stacked
-			}
 		}
 	}
+	chartDict['plotOptions'][chart1]=
+			{	stacking: stacked};
+
+	console.log(chartDict);
 	return chartDict;
 }
 
@@ -340,6 +341,12 @@ $('#generate-button').click(function(){
 	console.log(data_series2);
 	jQuery.ajax({
 		url: 'dataretrive/',
+		beforeSend: function(){
+			if($('#chart').highcharts() != undefined){
+				var x = $('#chart').highcharts();
+				x.showLoading()
+			}
+		},
 		data: {
 		admLevel: get_adm_level($('.adm-checkbox:checked').first()),
 		code: $('.adm-checkbox:checked').first().attr('value'),
@@ -384,6 +391,8 @@ $('#generate-button').click(function(){
 			);
 
 			$('#chart').highcharts(chartDict);
+			var x = $('#chart').highcharts();
+			x.hideLoading();
 		}
 		console.log(server_data);
 		});

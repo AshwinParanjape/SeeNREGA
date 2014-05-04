@@ -96,14 +96,6 @@
 													<li>ST</li>
 													<li>Others</li>
 													<li>Women</li>
-													<li class="aggregate">Total</li>
-												</div>
-											</div>
-											<div id="gender" class="indicator-unit col-md-6">
-												<h5> Gender</h5>
-												<div class="checkbox-group">
-													<li>Women</li>
-													<li>Others</li>
 												</div>
 											</div>
 										</div>
@@ -171,7 +163,7 @@
 								<ul class="blockAccordion">
 									{% for block_code,panchayatList in blockList.1.items %}
 
-									<input class="block-checkbox adm-checkbox" type="checkbox" value='{{block_code}}'/><li class="blockName"> {{panchayatList.0}} </li><ul></ul></br>
+									<input class="block-checkbox adm-checkbox" type="checkbox" value='{{block_code}}'/><li class="blockName"> {{panchayatList.0}} </li><ul></ul>
 									{% endfor %}
 								</ul>
 								{% endfor %}

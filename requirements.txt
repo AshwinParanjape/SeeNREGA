@@ -1,4 +1,4 @@
-Django==1.7b1
+#https://www.djangoproject.com/download/1.7b1/tarball/
 MySQL-python==1.2.5
 South==0.8.4
 argparse==1.2.1

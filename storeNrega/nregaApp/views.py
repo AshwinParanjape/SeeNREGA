@@ -1,11 +1,13 @@
 # Create your views here.
-import json
+import json 
 from django.core import serializers
 from django.shortcuts import render
 from django.http import HttpResponse
-from django.db.models import Sum
-
+from django.db.models import Sum, Count
+from django.contrib.staticfiles.templatetags.staticfiles import static
 from nregaApp.models import State, District, Block, Panchayat, PanchayatData
+from django.views.decorators.cache import cache_page
+
 import sys
 
 
@@ -13,12 +15,19 @@ import sys
 def index(request):
 	return 0
 
+#@cache_page(None)
 def panchayats(request,code_):
-	block_ = Block.objects.get(code = code_)
-	Panchayats = Panchayat.objects.filter(block = block_)
-	admStateJSON = json.dumps({p.code: p.name.title() for p in Panchayats})
-	return HttpResponse(admStateJSON, content_type='application/json')
+	print code_
+	existingPanchayats = PanchayatData.objects.filter(block_code = code_).values('panchayat_code').annotate(count = Count('attribute_0')).filter(count__gt = 1).values_list('panchayat_code', flat=True)
+	admPanchayat={}
+	for pcode in existingPanchayats:
+		panchayat_ = Panchayat.objects.get(code = pcode)
+		admPanchayat[panchayat_.code] = [panchayat_.name.title()]
 
+	admJSON = json.dumps(admPanchayat)
+	return HttpResponse(admJSON, content_type='application/json')
+
+#@cache_page(None)
 def dataretrive(request):
 	attr_0 = {'registrations':1,
 			'works':2}
@@ -72,18 +81,21 @@ def dataretrive(request):
 			#at some point introduce the need for generic lookup (for eg for attribute_0 too)
 			kwargs = { '{0}'.format(col_map[attributeValPair[0]]):reverseMap[attr_0[query['table']]][col_map[attributeValPair[0]]].index(attributeValPair[1])}
 			querySet=querySet.filter(**kwargs)
-		values = querySet.filter(attribute_0 = attr_0[query['table']]).values(col_map[query['s1']], col_map[query['s2']]).annotate(aggr_data = Sum('data')).order_by(col_map[query['s1']])
+
+		if query['s2']=='':
+			values = querySet.filter(attribute_0 = attr_0[query['table']]).values(col_map[query['s1']]).annotate(aggr_data = Sum('data')).order_by(col_map[query['s1']])
+			series = []
+			series.append( { 'name':'' ,'data': list(values.values_list('aggr_data',flat = True))})
+		else:
+			values = querySet.filter(attribute_0 = attr_0[query['table']]).values(col_map[query['s1']], col_map[query['s2']]).annotate(aggr_data = Sum('data')).order_by(col_map[query['s1']])
+			series = []
+			for attrValue in query.getlist('s2a[]'):
+				kwargs = { '{0}'.format(col_map[query['s2']]):reverseMap[attr_0[query['table']]][col_map[query['s2']]].index(attrValue)}
+				filteredvalues=values.filter(**kwargs)
+				series.append( { 'name': attrValue, 'data': list(filteredvalues.values_list('aggr_data',flat = True))})
 
 		
 		#single col specific. Needs to change sooner or later
-		series = []
-		for attrValue in query.getlist('s2a[]'):
-			kwargs = { '{0}'.format(col_map[query['s2']]):reverseMap[attr_0[query['table']]][col_map[query['s2']]].index(attrValue)}
-			filteredvalues=values.filter(**kwargs)
-			series.append(
-					{
-						'name': attrValue,
-						'data': list(filteredvalues.values_list('aggr_data',flat = True))})
 
 		#vlist = values.filter(col_map[query['s1']], col_map[query['s2']],'aggr_data')
 		#vlist = values.values_list(flat = True);
@@ -109,22 +121,25 @@ def admJSON(request):
 	admStateJSON = json.dumps(admState)
 	return HttpResponse(admStateJSON, content_type='application/json')
 
+#@cache_page(None)
 def query(request):
-	stateSet = State.objects.filter()
+	stateSet = State.objects.all()
 	admState = {}
-	for state_ in stateSet:
-		districtSet = District.objects.filter(state = state_)
+	existingStates = PanchayatData.objects.values('state_code').annotate(count = Count('attribute_0')).filter(count__gt = 1).values_list('state_code', flat=True);
+	for stateCode in existingStates:
 		admDistrict = {}
-		for district_ in districtSet:
-			blockSet = Block.objects.filter(district = district_)
+		existingDistricts = PanchayatData.objects.filter(state_code = stateCode).values('district_code').annotate(count = Count('attribute_0')).filter(count__gt = 1).values_list('district_code', flat=True);
+		for districtCode in existingDistricts:
 			admBlock = {}
-			for block_ in blockSet:
-				if(PanchayatData.objects.filter(block_code=block_.code).exists()):
-					admBlock[block_.code] = [block_.name.title()]
-				
-			if(PanchayatData.objects.filter(district_code=district_.code).exists()):
-				admDistrict[district_.code] = [district_.name.title(), admBlock]
-		if(PanchayatData.objects.filter(state_code=state_.code).exists()):
-			admState[state_.code] = [state_.name.title() , admDistrict]
+			existingBlocks = PanchayatData.objects.filter(district_code = districtCode).values('block_code').annotate(count = Count('attribute_0')).filter(count__gt = 1).values_list('block_code', flat=True);
+
+			for blockCode in existingBlocks:
+				print blockCode
+				block_ = Block.objects.get(code = blockCode)
+				admBlock[block_.code] = [block_.name.title()]
+			district_ = District.objects.get(code = districtCode)
+			admDistrict[district_.code] = [district_.name.title(), admBlock]
+		state_ = State.objects.get(code = stateCode)
+		admState[state_.code] = [state_.name.title() , admDistrict]
 	context = {'adm': admState}
 	return render(request, 'dashboard.html', context)

@@ -7,7 +7,7 @@
 #
 
 import sys
-sys.path.append('/home/ashwin/WebDev/virtualenvs/nrega/storeNrega/')
+sys.path.append('/home/synerg/virtualenv/nrega/SeeNREGA/storeNrega/')
 
 import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'storeNrega.settings'
@@ -19,3 +19,6 @@ NEWSPIDER_MODULE = 'scraper.spiders'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'scraper (+http://www.yourdomain.com)'
+
+AUTOTHROTTLE_ENABLED = True
+AUTOTHROTTLE_DEBUG = True

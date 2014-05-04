@@ -1,4 +1,4 @@
-from django.contrib.gis import admin
-from models import BlockBorder
+#from django.contrib.gis import admin
+#from models import BlockBorder
 
-admin.site.register(BlockBorder, admin.GeoModelAdmin)
+#admin.site.register(BlockBorder, admin.GeoModelAdmin)

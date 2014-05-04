@@ -1,6 +1,5 @@
 .ui-accordion .ui-accordion-header{
 	padding:0;
-	display:inline-block;
 }
 body, html { /* set size of body to full page and remove margins */
 	width: 100%;
@@ -33,6 +32,5 @@ body, html { /* set size of body to full page and remove margins */
 .no-alert{
 	display:none;
 }
-.panchayatName{
-	display:inline-block;
+input.adm-checkbox{
 }
