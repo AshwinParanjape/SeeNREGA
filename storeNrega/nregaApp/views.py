@@ -7,7 +7,6 @@ from django.db.models import Sum, Count
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from nregaApp.models import State, District, Block, Panchayat, PanchayatData
 from django.views.decorators.cache import cache_page
-
 import sys
 
 
@@ -17,17 +16,11 @@ def index(request):
 
 #@cache_page(None)
 def panchayats(request,code_):
-	print code_
-	existingPanchayats = PanchayatData.objects.filter(block_code = code_).values('panchayat_code').annotate(count = Count('attribute_0')).filter(count__gt = 1).values_list('panchayat_code', flat=True)
-	admPanchayat={}
-	for pcode in existingPanchayats:
-		panchayat_ = Panchayat.objects.get(code = pcode)
-		admPanchayat[panchayat_.code] = [panchayat_.name.title()]
+	block_ = Block.objects.get(code = code_)
+	Panchayats = Panchayat.objects.filter(block = block_)
+	admStateJSON = json.dumps({p.code: p.name.title() for p in Panchayats})
+	return HttpResponse(admStateJSON, content_type='application/json')
 
-	admJSON = json.dumps(admPanchayat)
-	return HttpResponse(admJSON, content_type='application/json')
-
-#@cache_page(None)
 def dataretrive(request):
 	attr_0 = {'registrations':1,
 			'works':2}
@@ -81,21 +74,18 @@ def dataretrive(request):
 			#at some point introduce the need for generic lookup (for eg for attribute_0 too)
 			kwargs = { '{0}'.format(col_map[attributeValPair[0]]):reverseMap[attr_0[query['table']]][col_map[attributeValPair[0]]].index(attributeValPair[1])}
 			querySet=querySet.filter(**kwargs)
-
-		if query['s2']=='':
-			values = querySet.filter(attribute_0 = attr_0[query['table']]).values(col_map[query['s1']]).annotate(aggr_data = Sum('data')).order_by(col_map[query['s1']])
-			series = []
-			series.append( { 'name':'' ,'data': list(values.values_list('aggr_data',flat = True))})
-		else:
-			values = querySet.filter(attribute_0 = attr_0[query['table']]).values(col_map[query['s1']], col_map[query['s2']]).annotate(aggr_data = Sum('data')).order_by(col_map[query['s1']])
-			series = []
-			for attrValue in query.getlist('s2a[]'):
-				kwargs = { '{0}'.format(col_map[query['s2']]):reverseMap[attr_0[query['table']]][col_map[query['s2']]].index(attrValue)}
-				filteredvalues=values.filter(**kwargs)
-				series.append( { 'name': attrValue, 'data': list(filteredvalues.values_list('aggr_data',flat = True))})
+		values = querySet.filter(attribute_0 = attr_0[query['table']]).values(col_map[query['s1']], col_map[query['s2']]).annotate(aggr_data = Sum('data')).order_by(col_map[query['s1']])
 
 		
 		#single col specific. Needs to change sooner or later
+		series = []
+		for attrValue in query.getlist('s2a[]'):
+			kwargs = { '{0}'.format(col_map[query['s2']]):reverseMap[attr_0[query['table']]][col_map[query['s2']]].index(attrValue)}
+			filteredvalues=values.filter(**kwargs)
+			series.append(
+					{
+						'name': attrValue,
+						'data': list(filteredvalues.values_list('aggr_data',flat = True))})
 
 		#vlist = values.filter(col_map[query['s1']], col_map[query['s2']],'aggr_data')
 		#vlist = values.values_list(flat = True);
@@ -123,7 +113,7 @@ def admJSON(request):
 
 #@cache_page(None)
 def query(request):
-	stateSet = State.objects.all()
+	stateSet = State.objects.filter()
 	admState = {}
 	existingStates = PanchayatData.objects.values('state_code').annotate(count = Count('attribute_0')).filter(count__gt = 1).values_list('state_code', flat=True);
 	for stateCode in existingStates:
